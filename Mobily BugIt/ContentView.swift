@@ -10,7 +10,8 @@ import SwiftUI
 struct ContentView: View {
     
     @State var bugDescription = ""
-    
+    @FocusState private var isDescriptionFieldFocused: Bool
+
     var body: some View {
         
         ZStack {
@@ -28,11 +29,11 @@ struct ContentView: View {
 
                         pickScreenshotButton
                         
-                        bugNoteTextView
+                        bugDescriptionTextView
                         
                         Spacer(minLength: 0)
                         
-                        submitButButton
+                        submitBugButton
                         
                     }
                     .padding(.top)
@@ -56,7 +57,8 @@ struct ContentView: View {
     
     private var pickScreenshotButton: some View {
         Button {
-            
+            isDescriptionFieldFocused = false
+
         } label: {
             Text("Pick Screenshot")
                 .font(.headline)
@@ -69,7 +71,7 @@ struct ContentView: View {
         }
     }
     
-    private var bugNoteTextView: some View {
+    private var bugDescriptionTextView: some View {
         ZStack(alignment: .topLeading) {
             
             
@@ -77,6 +79,7 @@ struct ContentView: View {
             TextEditor(text: $bugDescription)
                 .foregroundStyle(Color.black.opacity(0.8))
                 .padding(4)
+                .focused($isDescriptionFieldFocused)
             
             if bugDescription.isEmpty {
                 Text("Say something about this bug...")
@@ -94,9 +97,9 @@ struct ContentView: View {
         .padding()
     }
     
-    private var submitButButton: some View {
+    private var submitBugButton: some View {
         Button {
-            
+            isDescriptionFieldFocused = false
         } label: {
             Text("Submit Bug Review")
                 .font(.headline)
