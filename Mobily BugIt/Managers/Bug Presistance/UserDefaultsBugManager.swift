@@ -9,7 +9,7 @@ import Foundation
 
 final class UserDefaultsBugManager: BugStorageProtocol {
     
-    private let userDefaults = UserDefaults.init(suiteName: "group.BugIt")
+    private let userDefaults = UserDefaults.init(suiteName: "group.mobily.bugit")
     private let bugsKey = "savedBugs"
     
     func saveBug(_ bug: Bug) throws {

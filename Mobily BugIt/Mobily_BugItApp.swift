@@ -15,7 +15,7 @@ struct BugItApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            BugReportView()
         }
     }
 }

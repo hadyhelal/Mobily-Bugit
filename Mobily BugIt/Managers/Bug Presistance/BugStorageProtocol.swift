@@ -7,6 +7,6 @@
 
 protocol BugStorageProtocol {
     func saveBug(_ bug: Bug) throws
-    func loadBugs() async throws -> [Bug]
+    func loadBugs() throws -> [Bug]
     func deleteAll() throws
 }

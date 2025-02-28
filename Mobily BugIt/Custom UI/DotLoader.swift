@@ -22,7 +22,7 @@ struct DotLoader: View {
                 Circle()
                     .frame(width: 10,height: 10)
                     .offset(x: radius * CGFloat(cos(particle.angle * .pi/180)),y:radius * CGFloat(sin(particle.angle * .pi/180)))
-                    .foregroundStyle(Color.orange)
+                    .foregroundStyle(Color.primaryBugit)
             }
         }
         .onAppear{

@@ -28,83 +28,107 @@ struct ShareView: View {
     var extensionContext: NSExtensionContext?
         
     @StateObject private var viewModel = ShareViewModel()
-    @FocusState private var isDescriptionFieldFocused: Bool
     
     private let extractingQueue = DispatchQueue.global(qos: .userInitiated)
 
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                VStack {
-                    headerView
-                    descriptionTextField
-                    imagePreview
-                    actionButtons
-                    Spacer()
+                
+                Color.white
+
+                VStack(spacing: .zero) {
+                
+                    ScrollView {
+                        VStack(spacing: 16) {
+
+                            bugImageView
+
+                            bugDescriptionTextView
+                                                        
+                            VStack(spacing: 8) {
+                                submitBugButton
+                                
+                                cancelOperation
+                            }
+                            .padding(.horizontal)
+                            
+                            Spacer(minLength: 0)
+                        }
+                        .padding(.top)
+                        .padding(.bottom)
+                    }
                 }
-                .padding()
-                .onAppear {
+                .ignoresSafeArea(edges: .top)
+                .onAppear() {
                     extractImage(size: geometry.size)
                 }
+                .background(alignment: .bottomLeading) {
+                    Image(.topBanner)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: UIScreen.main.bounds.width * 1.5, height: UIScreen.main.bounds.height * 1.5)
+                        .opacity(0.2)
+                        .offset(y: -100)
+                }
+
+                if viewModel.showSuccessSubmitionDialog {
+                    BugSubmittedDialogView(isPresented: $viewModel.showSuccessSubmitionDialog, title: "Your bug has been submitted into the app!") {
+                        dismiss()
+                    }
+                    .offset(y: -200)
+                }
+
             }
+
+
         }
     }
-    
-    // Header view with title and cancel button
-    private var headerView: some View {
-        HStack {
-            Text("BugIt")
-                .font(.title2)
-                .fontWeight(.bold)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            Button(action: dismiss) {
-                Text("Cancel")
-                    .foregroundColor(.blue)
-            }
-        }
-        .padding(.bottom, 16)
-    }
-    
-    // TextField for entering description
-    private var descriptionTextField: some View {
-        TextField("Enter a description (optional)", text: $viewModel.description)
-            .focused($isDescriptionFieldFocused)
-            .padding(.vertical, 8)
-    }
-    
-    // Image preview with resizing
+
     @ViewBuilder
-    private var imagePreview: some View {
+    private var bugImageView: some View {
         if let image = viewModel.inputImage {
-            Image(uiImage: image)
+            Image(.screenshotEdge)
                 .resizable()
+                .frame(width: 150, height: 200)
                 .scaledToFit()
-                .frame(maxWidth: .infinity)
-                .frame(height: 300)
-                .padding(.bottom, 16)
+                .overlay {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 150)
+                        .padding(.bottom, 16)
+                }
         }
     }
     
-    
-    // Save and cancel buttons
-    private var actionButtons: some View {
-        HStack {
-            Button {
-                viewModel.save()
-                dismiss()
-            } label: {
-                Text("Send To App")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-                    .font(.headline)
+    private var bugDescriptionTextView: some View {
+        TextField("Enter bug description", text: $viewModel.description)
+            .foregroundStyle(Color.black)
+            .font(.callout)
+            .padding()
+            .background {
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color.gray, lineWidth: 0.3)
             }
+            .padding()
+
+    }
+    
+    private var submitBugButton: some View {
+        PrimaryButton(title: "Save bug into app", disabled: viewModel.isSubmitButtonDisabled) {
+            viewModel.save()
+        }
+    }
+    
+    private var cancelOperation: some View {
+        SecondaryButton(title: "Cancel") {
+            dismiss()
         }
     }
         
-    func extractImage(size: CGSize) {
+    private func extractImage(size: CGSize) {
         guard itemsProviders.isEmpty == false else { return }
         extractingQueue.async {
             for item in itemsProviders {
@@ -136,8 +160,12 @@ struct ShareView: View {
         }
     }
     
-    // Dismiss the extension context
     private func dismiss() {
         extensionContext?.completeRequest(returningItems: [])
     }
 }
+
+#Preview {
+    ShareView(itemsProviders: [])
+}
+
